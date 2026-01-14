@@ -196,7 +196,9 @@ void HuffmanCoding::decompress(const std::string& inputFilePath, const std::stri
     long long charsDecoded = 0;
     unsigned char byte;
 
+    // Read one Byte from file 
     while (charsDecoded < totalChars && inFile.read(reinterpret_cast<char*>(&byte), 1)) {
+        //Procces read Byte:
         for (int i = 7; i >= 0 && charsDecoded < totalChars; --i) {
             bool bit = (byte >> i) & 1;
             current = bit ? current->right : current->left;
