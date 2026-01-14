@@ -35,25 +35,19 @@ std::map<char, int> HuffmanCoding::generateDictionary(const std::string& text) {
 void HuffmanCoding::buildTree(const std::map<char, int>& frequencies) {
     MyPriorityQueue<Node*, NodeComparator> queue;
 
-    // Create new leaf nodes from frequencies and add to the priority queue
+    // Create new leaf nodes from frequencies and add them to the priority queue
     for (auto const& [ch, freq] : frequencies) {
         queue.push(new Node(ch, freq));
     }
     
     // HUFFMAN ALGORITHM: Merge nodes until only the root remains
     while (queue.size() > 1) {
-        // Pop two nodes with the lowest frequencies
         Node* left = queue.pop();
         Node* right = queue.pop();
 
-        // Create a new parent node
-        // Its frequency is the sum of its children's frequencies
-        // Character is set to '\0' as internal nodes don't store data
         Node* parent = new Node('\0', left->freq + right->freq);
         parent->left = left;
         parent->right = right;
-
-        // Push the parent back into the queue
         queue.push(parent);
     }
 
@@ -99,7 +93,7 @@ void HuffmanCoding::compress(const std::string& inputFilePath, const std::string
     // Open file in BINARY mode
     std::ofstream outFile(outputFilePath, std::ios::binary);
     
-    // Save dictionary (text-based header is fine)
+    // Save dictionary to file
     for (auto const& [ch, freq] : this->dictionary) {
         outFile << ch << ":" << freq << " ";
     }
@@ -124,7 +118,7 @@ void HuffmanCoding::compress(const std::string& inputFilePath, const std::string
         }
     }
 
-    // Handle remaining bits (Padding)
+    // Handle remaining bits
     if (bitCount > 0) {
         byteBuffer <<= (8 - bitCount);
         outFile.put(byteBuffer);
