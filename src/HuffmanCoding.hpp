@@ -9,13 +9,16 @@
 
 class HuffmanCoding {
 private:
-    //Storage for ready codes(ex. A:10, B:20 ...)
-    std::map<char, std::string> frequecies;
+    //Storage for frequencies(ex. A:10, B:20 ...)
+    std::map<char, int> dictionary;
+    //storage for codes(ex. A:0101, B:001011 ...)
+    std::map<char, std::string> huffmanCodes;
+
     Node* root;
 
     void generateCodes(Node* currentNode, std::string code);
     void clearTree(Node* currentNode);
-    std::map<char, int> countFrequencies(const std::string& text);
+    std::map<char, int> generateDictionary(const std::string& text);
     void buildTree(const std::map<char, int>& frequencies);
 
 public:
