@@ -10,12 +10,12 @@ template <typename T, typename Compare = std::less<T> >
 class MyPriorityQueue {
 private:
     std::vector<T> heap;
-    Compare compare; //definition for comparator
+    Compare compare; //comparator object
 
     void heapifyUp(int idx) {
         while (idx > 0) {
             int parent = (idx - 1) / 2;
-            
+            //comparing using default std:less or custom comprator
             if (compare(heap[idx], heap[parent])) {
                 std::swap(heap[idx], heap[parent]);
                 idx = parent;
