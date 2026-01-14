@@ -146,11 +146,12 @@ void HuffmanCoding::decompress(const std::string& inputFilePath, const std::stri
         return;
     }
 
-    std::map<char, int> restoredFreqs;
+    std::map<char, int> restoredDictionary;
     long long totalChars = 0;
 
     //Parse Dictionary
     for (size_t i = 0; i < line.length(); ++i) {
+    //Get Key(Char)
         char ch;
         // check for \n \r
         if (line[i] == '\\' && i + 1 < line.length()) {
@@ -162,8 +163,8 @@ void HuffmanCoding::decompress(const std::string& inputFilePath, const std::stri
             ch = line[i];
         }
 
+    //Get Value(Number)    
         size_t colonPos = line.find(':', i + 1);
-        
         if (colonPos != std::string::npos) {
             std::string numStr = "";
             size_t j = colonPos + 1;
@@ -174,8 +175,8 @@ void HuffmanCoding::decompress(const std::string& inputFilePath, const std::stri
             }
             //convert string number and add to dictionary
             if (!numStr.empty()) {
-                restoredFreqs[ch] = std::stoi(numStr);
-                totalChars += restoredFreqs[ch];
+                restoredDictionary[ch] = std::stoi(numStr);
+                totalChars += restoredDictionary[ch];
                 i = j;
             }
         }
@@ -186,7 +187,7 @@ void HuffmanCoding::decompress(const std::string& inputFilePath, const std::stri
         clearTree(root);
         root = nullptr;
     }
-    buildTree(restoredFreqs);
+    buildTree(restoredDictionary);
 
     //Binary Decoding
     std::ofstream outFile(outputFilePath, std::ios::binary);

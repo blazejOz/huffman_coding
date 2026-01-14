@@ -1,0 +1,80 @@
+================================================================================
+DOKUMENTACJA TECHNICZNA: MODUŁ KOMPRESJI HUFFMANA
+Projekt: HuffmanCoding (C++ / GCC)
+Autor: blazejOz
+================================================================================
+
+1. PRZEGLĄD SYSTEMU
+-------------------
+Program realizuje bezstratną kompresję danych metodą kodowania Huffmana. 
+Zaimplementowany algorytm wykorzystuje statystyczną analizę częstości 
+występowania znaków do generowania kodów o zmiennej długości (VLC). 
+Często występujące znaki otrzymują krótsze kody bitowe, co pozwala na 
+redukcję rozmiaru pliku wyjściowego.
+
+2. SPECYFIKACJA KLASY HuffmanCoding
+-----------------------------------
+Główna klasa zarządzająca procesem kompresji i dekompresji.
+
+Kluczowe pola:
+- Node* root: Wskaźnik na korzeń drzewa Huffmana.
+- std::map<char, int> dictionary: Przechowuje częstotliwość znaków.
+- std::map<char, std::string> huffmanCodes: Przechowuje wygenerowane kody binarne.
+
+Kluczowe metody:
+- compress(): Odczytuje plik, buduje drzewo, zapisuje nagłówek i bity.
+- decompress(): Parsuje nagłówek, odtwarza drzewo i dekoduje strumień bitowy.
+- buildTree(): Wykorzystuje autorską kolejkę priorytetową (Min-Heap).
+
+3. STRUKTURA PLIKU SKOMPRESOWANEGO (.huff)
+------------------------------------------
+Plik składa się z dwóch sekcji rozdzielonych znakiem nowej linii (\n):
+
+A. NAGŁÓWEK (Słownik):
+Format: ZNAK:CZĘSTOTLIWOŚĆ (np. a:10 b:5 \n:2)
+W celu zachowania integralności nagłówka zastosowano mechanizm "Escape Characters":
+- Znak nowej linii zapisywany jest jako sekwencja tekstowa "\n".
+- Znak powrotu karetki zapisywany jest jako "\r".
+Dzięki temu słownik zawsze zajmuje dokładnie JEDNĄ linię tekstu.
+
+B. DANE BINARNE:
+Surowy strumień bitów spakowany w bajty (unsigned char).
+
+4. IMPLEMENTACJA KOLEJKI (MyPriorityQueue)
+------------------------------------------
+Kolejka została zaimplementowana jako kopiec binarny typu Min-Heap na wektorze.
+- Złożoność push/pop: O(log n).
+- Wykorzystuje NodeComparator do porównywania wskaźników na węzły na podstawie
+  pola 'freq' (częstotliwość).
+
+5. LOGIKA PARSOWANIA I DEKODOWANIA (BIT-BY-BIT)
+-----------------------------------------------
+Podczas dekompresji program wykorzystuje następujące techniki:
+
+A. Parser "One-Char-Before":
+Program lokalizuje dwukropek (:) i przyjmuje, że dokładnie jeden znak przed nim 
+jest kluczem. Rozwiązuje to problem występowania dwukropka jako znaku w tekście.
+
+B. Odczyt Bajtowy (Buffer):
+Dane czytane są z dysku w paczkach po 8 bitów (unsigned char). Pętla bitowa
+for (int i = 7; i >= 0; --i) rozbija bajt na pojedyncze bity przy użyciu
+przesunięcia bitowego (byte >> i) & 1.
+
+C. Warunek Stopu (totalChars):
+Zamiast polegać na znaczniku EOF, program sumuje wszystkie częstotliwości 
+z nagłówka (totalChars). Dekompresja kończy się dokładnie po odzyskaniu 
+zakładanej liczby znaków, co eliminuje błędy związane z tzw. "paddingiem" 
+(zerami dopisanymi do ostatniego bajtu).
+
+6. OBSŁUGA ARGUMENTÓW (CLI)
+---------------------------
+Program obsługuje następujące flagi wiersza poleceń:
+-c : Kompresja pliku wejściowego.
+-d : Dekompresja pliku wejściowego.
+
+Składnia: ./Huffman.out [OPCJA] [PLIK_IN] [OPCJONALNIE: PLIK_OUT]
+Jeśli nie podano PLIK_OUT, program generuje nazwę domyślną:
+- compressed.huff (dla kompresji)
+- decompressed.txt (dla dekompresji)
+
+================================================================================
