@@ -76,7 +76,10 @@ void HuffmanCoding::generateCodes(Node* currentNode, std::string code) {
 // Public method: File compression
 void HuffmanCoding::compress(const std::string& inputFilePath, const std::string& outputFilePath) {
     std::ifstream inFile(inputFilePath, std::ios::binary);
-    if (!inFile.is_open()) return;
+    if (!inFile.is_open()) {
+        std::cerr << "BŁĄD: Nie można otworzyć pliku do dekompresji: " << inputFilePath << std::endl;
+        return;
+    }
 
     std::stringstream ss;
     ss << inFile.rdbuf();
@@ -95,7 +98,9 @@ void HuffmanCoding::compress(const std::string& inputFilePath, const std::string
     
     // Save dictionary to file
     for (auto const& [ch, freq] : this->dictionary) {
-        outFile << ch << ":" << freq << " ";
+        if (ch == '\n') outFile << "\\n:" << freq << " ";
+        else if (ch == '\r') outFile << "\\r:" << freq << " ";
+        else outFile << ch << ":" << freq << " ";
     }
     outFile << "\n";
 
@@ -129,49 +134,67 @@ void HuffmanCoding::compress(const std::string& inputFilePath, const std::string
 // Public method: File decompression
 void HuffmanCoding::decompress(const std::string& inputFilePath, const std::string& outputFilePath) {
     std::ifstream inFile(inputFilePath, std::ios::binary);
-    if (!inFile.is_open()) return;
+    if (!inFile.is_open()) {
+        std::cerr << "BŁĄD: Nie można otworzyć pliku: " << inputFilePath << std::endl;
+        return;
+    }
 
-//Generate Dictionary 
-    std::string headerLine;
-    if (!std::getline(inFile, headerLine) || headerLine.empty()) return;
+    // 1. Odczyt słownika (Tylko JEDNO getline)
+    std::string line;
+    if (!std::getline(inFile, line) || line.empty()) {
+        std::cerr << "BŁĄD: Brak słownika w pliku." << std::endl;
+        return;
+    }
 
     std::map<char, int> restoredFreqs;
     long long totalChars = 0;
 
-    for (size_t i = 0; i < headerLine.length(); ++i) {
-        if (i + 1 < headerLine.length() && headerLine[i + 1] == ':') {
-            char ch = headerLine[i];
-            size_t colonPos = i + 1;
+    // 2. Parser słownika z obsługą \n i \r
+    for (size_t i = 0; i < line.length(); ++i) {
+        char ch;
+        // Sprawdzamy czy to znak specjalny zapisany jako \n lub \r
+        if (line[i] == '\\' && i + 1 < line.length()) {
+            if (line[i+1] == 'n') ch = '\n';
+            else if (line[i+1] == 'r') ch = '\r';
+            else ch = line[i]; 
+            i++; 
+        } else {
+            ch = line[i];
+        }
+
+        // Szukamy dwukropka po znaku
+        size_t colonPos = line.find(':', i + 1);
+        if (colonPos != std::string::npos) {
             std::string numStr = "";
             size_t j = colonPos + 1;
-
-            while (j < headerLine.length() && std::isdigit(headerLine[j])) {
-                numStr += headerLine[j];
+            while (j < line.length() && std::isdigit(line[j])) {
+                numStr += line[j];
                 j++;
             }
-
             if (!numStr.empty()) {
                 restoredFreqs[ch] = std::stoi(numStr);
                 totalChars += restoredFreqs[ch];
-                i = j - 1;
+                i = j; // Przeskok za liczbę i spację separatora
             }
         }
     }
 
-    // Clear old root tree
+    // 3. Odbudowa drzewa
     if (root != nullptr) {
         clearTree(root);
         root = nullptr;
     }
-
     buildTree(restoredFreqs);
 
-//Decode binary code:
+    // 4. Dekodowanie binarne
     std::ofstream outFile(outputFilePath, std::ios::binary);
+    if (!outFile.is_open()) return;
+
     Node* current = root;
     long long charsDecoded = 0;
     unsigned char byte;
 
+    // inFile czyta teraz od razu po znaku \n kończącym słownik
     while (charsDecoded < totalChars && inFile.read(reinterpret_cast<char*>(&byte), 1)) {
         for (int i = 7; i >= 0 && charsDecoded < totalChars; --i) {
             bool bit = (byte >> i) & 1;
@@ -181,8 +204,12 @@ void HuffmanCoding::decompress(const std::string& inputFilePath, const std::stri
                 outFile.put(current->ch);
                 charsDecoded++;
                 current = root;
+                if (charsDecoded == totalChars) break;
             }
         }
     }
+
     outFile.close();
+    inFile.close();
+    std::cout << "Dekompresja zakonczona sukcesem!" << std::endl;
 }
