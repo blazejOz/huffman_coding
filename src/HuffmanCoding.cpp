@@ -135,24 +135,24 @@ void HuffmanCoding::compress(const std::string& inputFilePath, const std::string
 void HuffmanCoding::decompress(const std::string& inputFilePath, const std::string& outputFilePath) {
     std::ifstream inFile(inputFilePath, std::ios::binary);
     if (!inFile.is_open()) {
-        std::cerr << "BŁĄD: Nie można otworzyć pliku: " << inputFilePath << std::endl;
+        std::cerr << "Error: Can't open file: " << inputFilePath << std::endl;
         return;
     }
 
-    // 1. Odczyt słownika (Tylko JEDNO getline)
+    // Read Dictionery Line
     std::string line;
     if (!std::getline(inFile, line) || line.empty()) {
-        std::cerr << "BŁĄD: Brak słownika w pliku." << std::endl;
+        std::cerr << "Error: No Dictionary" << std::endl;
         return;
     }
 
     std::map<char, int> restoredFreqs;
     long long totalChars = 0;
 
-    // 2. Parser słownika z obsługą \n i \r
+    //Parse Dictionary
     for (size_t i = 0; i < line.length(); ++i) {
         char ch;
-        // Sprawdzamy czy to znak specjalny zapisany jako \n lub \r
+        // check for \n \r
         if (line[i] == '\\' && i + 1 < line.length()) {
             if (line[i+1] == 'n') ch = '\n';
             else if (line[i+1] == 'r') ch = '\r';
@@ -162,31 +162,33 @@ void HuffmanCoding::decompress(const std::string& inputFilePath, const std::stri
             ch = line[i];
         }
 
-        // Szukamy dwukropka po znaku
         size_t colonPos = line.find(':', i + 1);
+        
         if (colonPos != std::string::npos) {
             std::string numStr = "";
             size_t j = colonPos + 1;
+            //build string number
             while (j < line.length() && std::isdigit(line[j])) {
                 numStr += line[j];
                 j++;
             }
+            //convert string number and add to dictionary
             if (!numStr.empty()) {
                 restoredFreqs[ch] = std::stoi(numStr);
                 totalChars += restoredFreqs[ch];
-                i = j; // Przeskok za liczbę i spację separatora
+                i = j;
             }
         }
     }
 
-    // 3. Odbudowa drzewa
+    //Clear and Rebuild Tree
     if (root != nullptr) {
         clearTree(root);
         root = nullptr;
     }
     buildTree(restoredFreqs);
 
-    // 4. Dekodowanie binarne
+    //Binary Decoding
     std::ofstream outFile(outputFilePath, std::ios::binary);
     if (!outFile.is_open()) return;
 
@@ -194,7 +196,6 @@ void HuffmanCoding::decompress(const std::string& inputFilePath, const std::stri
     long long charsDecoded = 0;
     unsigned char byte;
 
-    // inFile czyta teraz od razu po znaku \n kończącym słownik
     while (charsDecoded < totalChars && inFile.read(reinterpret_cast<char*>(&byte), 1)) {
         for (int i = 7; i >= 0 && charsDecoded < totalChars; --i) {
             bool bit = (byte >> i) & 1;
