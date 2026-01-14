@@ -4,17 +4,19 @@
 #include <vector>
 #include <algorithm>
 #include <stdexcept>
+#include <functional>
 
-template <typename T>
+template <typename T, typename Compare = std::less<T> >
 class MyPriorityQueue {
 private:
     std::vector<T> heap;
+    Compare compare; //definition for comparator
 
     void heapifyUp(int idx) {
         while (idx > 0) {
             int parent = (idx - 1) / 2;
-            // Używamy operatora < , więc T musi go obsługiwać
-            if (heap[idx] < heap[parent]) {
+            
+            if (compare(heap[idx], heap[parent])) {
                 std::swap(heap[idx], heap[parent]);
                 idx = parent;
             } else break;
@@ -26,14 +28,15 @@ private:
         int left = 2 * idx + 1;
         int right = 2 * idx + 2;
 
-        if (left < heap.size() && heap[left] < heap[smallest]) smallest = left;
-        if (right < heap.size() && heap[right] < heap[smallest]) smallest = right;
+        if (left < heap.size() && compare(heap[left], heap[smallest])) smallest = left;
+        if (right < heap.size() && compare(heap[right], heap[smallest])) smallest = right;
 
         if (smallest != idx) {
             std::swap(heap[idx], heap[smallest]);
             heapifyDown(smallest);
         }
     }
+
 
 public:
     // Dodawanie elementu

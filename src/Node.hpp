@@ -1,4 +1,4 @@
-#ifdef NODE_HPP
+#ifndef NODE_HPP
 #define NODE_HPP
 
 struct Node{
@@ -8,11 +8,13 @@ struct Node{
 
     Node(char c, int f) : ch(c), freq(f), left(nullptr), right(nullptr) {}
 
-    //overloading '<' operator for MyPriorityQueue comparison
-    bool operator<(const Node& other) const {
-        return this->freq < other.freq;
-    }
+};
 
+// Structure for node comparison in MyPriorityQueue.hpp
+struct NodeComparator {
+    bool operator()(const Node* a, const Node* b) const {
+        return a->freq < b->freq;
+    }
 };
 
 #endif
