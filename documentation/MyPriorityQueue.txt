@@ -1,0 +1,85 @@
+================================================================================
+DOKUMENTACJA TECHNICZNA: MyPriorityQueue
+================================================================================
+
+1. OPIS OGÓLNY
+--------------
+MyPriorityQueue to uniwersalna, szablonowa implementacja kolejki priorytetowej 
+opartej na strukturze kopca binarnego typu Min-Heap. Choć w tym projekcie 
+służy do obsługi węzłów drzewa Huffmana, jej konstrukcja pozwala na 
+przechowywanie i sortowanie dowolnych typów danych, dla których zdefiniowano 
+odpowiedni komparator.
+
+2. STRUKTURA I DZIAŁANIE
+------------------------
+- Typ: Kopiec binarny (Min-Heap).
+- Kontener bazowy: std::vector<T> (zapewnia dynamiczną alokację pamięci).
+- Uniwersalność: Klasa akceptuje dowolny typ danych T oraz strukturę 
+  porównującą (Comparator), co pozwala na elastyczne definiowanie priorytetów.
+
+
+
+3. GŁÓWNE METODY (API)
+----------------------
+- void build(std::vector<T> elements):
+    Metoda pozwalająca na szybkie zbudowanie kopca z gotowego zestawu danych.
+    Zamiast dodawać elementy jeden po drugim, metoda reorganizuje cały wektor, 
+    co jest bardziej wydajne przy dużych zbiorach danych.
+    Złożoność: O(n).
+
+- void push(T element): 
+    Wstawia nowy element na koniec wektora i wykonuje operację "naprawy" 
+    kopca w górę (heapify up), aż zostanie przywrócona właściwość kopca.
+    Złożoność: O(log n).
+
+- T pop(): 
+    Pobiera element ze szczytu (o najwyższym priorytecie / najmniejszej 
+    wartości), zastępuje go ostatnim elementem w wektorze i wykonuje 
+    operację "naprawy" kopca w dół (heapify down).
+    Złożoność: O(log n).
+
+- T top(): 
+    Zwraca referencję do elementu na szczycie kopca bez usuwania go.
+    Złożoność: O(1).
+
+- int size(): 
+    Zwraca aktualną liczbę elementów znajdujących się w kolejce.
+
+- bool isEmpty(): 
+    Zwraca true, jeśli kolejka nie zawiera żadnych elementów.
+
+4. ZASTOSOWANIE W ALGORYTMIE HUFFMANA
+-------------------------------------
+Kolejka gwarantuje, że podczas budowy drzewa zawsze pobierane są dwa węzły 
+o najniższej częstotliwości (wartość freq). Dzięki strukturze kopca proces 
+ten jest optymalny obliczeniowo, co pozwala na szybkie generowanie kodów 
+nawet dla bardzo dużych plików tekstowych.
+
+================================================================================
+INSTRUKCJA URUCHOMIENIA (SANDBOX)
+================================================================================
+
+Piaskownica (Sandbox) pozwala na przetestowanie samej struktury MyPriorityQueue 
+niezależnie od algorytmu Huffmana, np. poprzez sortowanie liczb lub znaków.
+
+1. KOMPILACJA
+-------------
+Otwórz terminal w folderze projektu i skompiluj plik piaskownicy:
+
+g++ -std=c++17 PriorityQueueSandbox.cpp -o PriorityQueueSandbox.out
+
+2. URUCHOMIENIE
+---------------
+Uruchom przygotowany plik wykonywalny:
+
+./PriorityQueueSandbox.out
+
+3. TESTOWANIE
+-------------
+Program demonstracyjny powinien:
+- Dodać zestaw losowych elementów do kolejki.
+- Wykorzystać metodę build() do stworzenia struktury.
+- Wyciągać elementy jeden po drugim, prezentując je w kolejności od 
+  najmniejszego do największego (zgodnie z zasadą Min-Heap).
+
+================================================================================
