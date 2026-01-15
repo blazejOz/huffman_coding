@@ -1,2 +1,48 @@
-Ala ma kota, kot ma Ale
-Algorytmy nie sa trudne wcale
+Informally, an algorithm is any well-defined computational procedure
+that takes some value, or set of values, as input and produces some
+value, or set of values, as output in a finite amount of time. An
+algorithm is thus a sequence of computational steps that transform the
+input into the output.
+You can also view an algorithm as a tool for solving a well-specified
+computational problem. The statement of the problem specifies in
+general terms the desired input/output relationship for problem
+instances, typically of arbitrarily large size. The algorithm describes a
+specific computational procedure for achieving that input/output
+relationship for all problem instances.
+As an example, suppose that you need to sort a sequence of numbers
+into monotonically increasing order. This problem arises frequently in
+practice and provides fertile ground for introducing many standard
+design techniques and analysis tools. Here is how we formally define the
+sorting problem:
+Input: A sequence of n numbers 〈a1, a2, … , an〉.
+Output: A permutation (reordering) of the input sequence
+such that .
+Thus, given the input sequence 〈31, 41, 59, 26, 41, 58〉, a correct sorting
+algorithm returns as output the sequence 〈26, 31, 41, 41, 58, 59〉. Such
+an input sequence is called an instance of the sorting problem. In
+general, an instance of a problem1 consists of the input (satisfying
+whatever constraints are imposed in the problem statement) needed to
+compute a solution to the problem.
+Because many programs use it as an intermediate step, sorting is a
+fundamental operation in computer science. As a result, you have a
+large number of good sorting algorithms at your disposal. Which
+algorithm is best for a given application depends on—among other
+factors—the number of items to be sorted, the extent to which the items
+are already somewhat sorted, possible restrictions on the item values,
+the architecture of the computer, and the kind of storage devices to be
+used: main memory, disks, or even—archaically—tapes.
+An algorithm for a computational problem is correct if, for every
+problem instance provided as input, it halts—finishes its computing in
+finite time—and outputs the correct solution to the problem instance. A
+correct algorithm solves the given computational problem. An incorrect
+algorithm might not halt at all on some input instances, or it might halt
+with an incorrect answer. Contrary to what you might expect, incorrect
+algorithms can sometimes be useful, if you can control their error rate.
+We’ll see an example of an algorithm with a controllable error rate in
+Chapter 31 when we study algorithms for finding large prime numbers.
+Ordinarily, however, we’ll concern ourselves only with correct
+algorithms.
+An algorithm can be specified in English, as a computer program, or
+even as a hardware design. The only requirement is that the specification
+must provide a precise description of the computational procedure to be
+followed.
