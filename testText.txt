@@ -1,3 +1,0 @@
-Test: 1, 2, 3... 
-Czy Huffman: poradzi sobie z : tym :: dziwnym --- formatem?
-Wartosc: 100%
