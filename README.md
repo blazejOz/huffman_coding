@@ -18,7 +18,8 @@ HUFFMAN_CODING/
 ├── src/                     # Pliki źródłowe i nagłówkowe
 │   ├── HuffmanCoding.cpp    # Główna logika algorytmu
 │   ├── HuffmanCoding.hpp 
-│   ├── MyPriorityQueue.hpp  # Implementacja kopca (Min-Heap)
+│   ├── MyPriorityQueue.cpp  # Implementacja kopca (Min-Heap)
+│   ├── MyPriorityQueue.hpp  
 │   └── Node.hpp             # Struktura węzła drzewa
 ├── documentation/           # Dokumentacja techniczna
 │   ├── HuffmanCoding.txt 
