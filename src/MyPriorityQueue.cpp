@@ -1,5 +1,4 @@
 #include "MyPriorityQueue.hpp"
-#include <algorithm>
 
 void MyPriorityQueue::heapifyUp(int idx) {
     while (idx > 0) {
@@ -26,7 +25,7 @@ void MyPriorityQueue::heapifyDown(int idx) {
         smallest = left;
     }
 
-    // Check if right child exists and is SMALLER than current smallest
+    // Check if right child exists and is smaller than current smallest
     if (right < (int)heap.size() && compare(heap[smallest], heap[right])) {
         smallest = right;
     }
@@ -63,6 +62,7 @@ void MyPriorityQueue::build(const std::vector<Node*>& data) {
     }
 }
 
+//
 void MyPriorityQueue::print(){
     for(Node* node: heap){
         std::cout << node->freq << ":" << node->ch << ' ';

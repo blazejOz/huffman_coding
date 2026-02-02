@@ -31,13 +31,15 @@ std::map<char, int> HuffmanCoding::generateDictionary(const std::string& text) {
 }
 
 // Private method: Building the Huffman tree using MyPriorityQueue
-void HuffmanCoding::buildTree(const std::map<char, int>& frequencies) {
+void HuffmanCoding::buildTree(const std::map<char, int>& dictionary) {
     MyPriorityQueue queue;
     std::vector<Node*> nodes;
-    // Create new leaf nodes from frequencies and add them to the priority queue
-    for (auto const& [ch, freq] : frequencies) {
+    // Create new leaf nodes from dictionary and add them to the priority queue
+    for (auto const& [ch, freq] : dictionary) {
         nodes.push_back(new Node(std::string(1, ch), freq));
     }
+
+    //Build PriorityQueue from list of nodes
     queue.build(nodes);
     
     // HUFFMAN ALGORITHM: Merge nodes until only the root remains
@@ -52,7 +54,10 @@ void HuffmanCoding::buildTree(const std::map<char, int>& frequencies) {
         parent->left = left;
         parent->right = right;
         queue.push(parent);
+        //Uncomment to print queue after each iteration:
+        //queue.print();
     }
+    
 
     // Set the last remaining element in the queue as the ROOT
     if (!queue.isEmpty()) {
@@ -151,12 +156,12 @@ void HuffmanCoding::decompress(const std::string& inputFilePath, const std::stri
         return;
     }
 
-    std::map<char, int> restoredDictionary;
+    this->dictionary.clear();
     long long totalChars = 0;
 
     //Parse Dictionary
     for (size_t i = 0; i < line.length(); ++i) {
-    //Get Key(Char)
+        //Get Key(Char)
         char ch;
         // check for \n \r
         if (line[i] == '\\' && i + 1 < line.length()) {
@@ -168,7 +173,7 @@ void HuffmanCoding::decompress(const std::string& inputFilePath, const std::stri
             ch = line[i];
         }
 
-    //Get Value(Number)    
+        //Get Value(Number)    
         size_t colonPos = line.find(':', i + 1);
         if (colonPos != std::string::npos) {
             std::string numStr = "";
@@ -180,8 +185,8 @@ void HuffmanCoding::decompress(const std::string& inputFilePath, const std::stri
             }
             //convert string number and add to dictionary
             if (!numStr.empty()) {
-                restoredDictionary[ch] = std::stoi(numStr);
-                totalChars += restoredDictionary[ch];
+                this->dictionary[ch] = std::stoi(numStr);
+                totalChars += this->dictionary[ch];
                 i = j;
             }
         }
@@ -192,7 +197,7 @@ void HuffmanCoding::decompress(const std::string& inputFilePath, const std::stri
         clearTree(root);
         root = nullptr;
     }
-    buildTree(restoredDictionary);
+    buildTree(this->dictionary);
 
     //Binary Decoding
     std::ofstream outFile(outputFilePath, std::ios::binary);
