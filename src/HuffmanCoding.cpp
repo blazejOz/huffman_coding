@@ -1,5 +1,4 @@
 #include "HuffmanCoding.hpp"
-#include "Node.hpp"
 #include "MyPriorityQueue.hpp"
 #include <iostream>
 #include <fstream>
@@ -33,19 +32,23 @@ std::map<char, int> HuffmanCoding::generateDictionary(const std::string& text) {
 
 // Private method: Building the Huffman tree using MyPriorityQueue
 void HuffmanCoding::buildTree(const std::map<char, int>& frequencies) {
-    MyPriorityQueue<Node*, NodeComparator> queue;
-
+    MyPriorityQueue queue;
+    std::vector<Node*> nodes;
     // Create new leaf nodes from frequencies and add them to the priority queue
     for (auto const& [ch, freq] : frequencies) {
-        queue.push(new Node(ch, freq));
+        nodes.push_back(new Node(std::string(1, ch), freq));
     }
+    queue.build(nodes);
     
     // HUFFMAN ALGORITHM: Merge nodes until only the root remains
     while (queue.size() > 1) {
         Node* left = queue.pop();
         Node* right = queue.pop();
 
-        Node* parent = new Node('\0', left->freq + right->freq);
+        // Concatenate strings from left and right children
+        std::string combinedStr = left->ch + right->ch;
+
+        Node* parent = new Node(combinedStr, left->freq + right->freq);
         parent->left = left;
         parent->right = right;
         queue.push(parent);
@@ -61,10 +64,12 @@ void HuffmanCoding::buildTree(const std::map<char, int>& frequencies) {
 void HuffmanCoding::generateCodes(Node* currentNode, std::string code) {
     if (currentNode == nullptr) return;
 
-    // Check if it's a leaf node (no children)
+    // A leaf node in a Huffman tree is defined by having no children
     if (currentNode->left == nullptr && currentNode->right == nullptr) {
-        // Save the generated bit string to the huffmanCodes map
-        huffmanCodes[currentNode->ch] = code; 
+        if (!currentNode->ch.empty()) {
+            char actualChar = currentNode->ch[0]; 
+            huffmanCodes[actualChar] = code; 
+        }
         return;
     }
 
@@ -205,10 +210,10 @@ void HuffmanCoding::decompress(const std::string& inputFilePath, const std::stri
             current = bit ? current->right : current->left;
 
             if (current->left == nullptr && current->right == nullptr) {
-                outFile.put(current->ch);
+                char ch = current->ch[0]; 
+                outFile.put(ch);
                 charsDecoded++;
                 current = root;
-                if (charsDecoded == totalChars) break;
             }
         }
     }
